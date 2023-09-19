@@ -1,6 +1,8 @@
 # Chat-GPT-telegram-bot
 Telegram bot representing chat GPT, using Chat GTP API
 
+ОБНОВЛЕНИЕ: Доступен диалог с ботом с сохранением и анализом прошлых сообщений
+
 В классе Main инициализируется Телеграм бот, который принимает запросы из телеграмм, отправляет chat GPT API и обрабатывает ответ.
 Для безопасности я не включил Properties файл в код программы.
 ссылка на бота: https://t.me/Free_Chat_GPT_4_bot

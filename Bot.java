@@ -19,7 +19,7 @@ public class Bot extends TelegramLongPollingBot {
         System.out.println("request!");
 
         Message message = update.getMessage();
-        String text = message.getText();
+        String text = message.getText().replace("\"", "`").replace("\n", "").replace("\\", "");
         Long id = message.getChatId();
 
         if(text.equals("/start"))
@@ -31,12 +31,18 @@ public class Bot extends TelegramLongPollingBot {
         String HttpRequestBody =
                           "{" +
                              "\"model\": \"" + Properties.model + "\"," +
-                             "\"messages\": [{\"role\": \"user\", \"content\": \"" +
-                                text.replace("\"", "'") +
-                             "\"}]," +
+                             "\"messages\": [" +
+                                MessageUtil.getAllMessages(id).replace("\n", "").replace("\\", "")  +
+
+                                "{\"role\": \"user\", \"content\": \"" +
+                                    text +
+                                "\"}" +
+
+                             "]," +
                              "\"temperature\": 0.7" +
                            "}";
 
+        System.out.println("HttpRequestBody : " + HttpRequestBody);
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -47,8 +53,11 @@ public class Bot extends TelegramLongPollingBot {
                 .build();
 
         try {
+
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String responseBody = response.body().replace("\\n", "\n");
+            String responseBody = response.body().replace("\\n", "\n").replace("\\\"", "`");
+
+            System.out.println("response: " + responseBody);
 
             int firstIndex = responseBody.indexOf("\"content\": \"") + "\"content\": \"".length();
 
@@ -57,8 +66,9 @@ public class Bot extends TelegramLongPollingBot {
             while(responseBody.charAt(i) != '"')
                 builder.append(responseBody.charAt(i++));
 
-            String result = builder.toString().replace("\\\"", "'");
-            mail.setText(result);
+            String result = builder.toString();
+            MessageUtil.addMessage(id, text.replace("\"", "`"), result);
+            mail.setText(result.replace("`", "\""));
 
         } catch (IOException | InterruptedException e) {
             System.out.println("exception " + e);
