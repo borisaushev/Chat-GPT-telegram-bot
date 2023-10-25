@@ -9,6 +9,7 @@ Telegram bot representing chat GPT, using Chat GTP API
 Если он вам не отвечает это значит что он в данный момент не работает
 
 Фоточки
+
 ![image](https://github.com/borisaushev/Chat-GPT-telegram-bot/assets/57569512/b222b429-ce0b-419f-8f07-aac96978c90d)
 
 ![image](https://github.com/borisaushev/Chat-GPT-telegram-bot/assets/57569512/7032d36c-7367-4aaa-9054-5ace59a04238)
