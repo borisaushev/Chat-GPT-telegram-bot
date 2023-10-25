@@ -8,7 +8,11 @@ Telegram bot representing chat GPT, using Chat GTP API
 ссылка на бота: https://t.me/Free_Chat_GPT_4_bot
 Если он вам не отвечает это значит что он в данный момент не работает
 
-Фоточки
+Фоточки:
+
+
+
+
 
 ![image](https://github.com/borisaushev/Chat-GPT-telegram-bot/assets/57569512/b222b429-ce0b-419f-8f07-aac96978c90d)
 
