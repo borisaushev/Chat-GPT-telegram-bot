@@ -1,43 +1,43 @@
 package Util;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class RequestUtil {
-    public static HttpRequest buildRequest(String userRequest, long userId) {
-        //building the request
-        String HttpRequestBody =
-                "{" +
-                    "\"model\": \"" + Properties.model + "\"," +
-                    "\"messages\": [" +
-                    MessageUtil.getAllMessages(userId).replace("\n", "").replace("\\", "")  +
+    public static HttpRequest buildRequest(long userId) {
+        //making request json object
+        JSONObject request = new JSONObject();
+        request.put("model", Properties.model);
+        request.put("temperature", 0.7);
 
-                    "{\"role\": \"user\", \"content\": \"" +
-                    userRequest +
-                    "\"}" +
+        //adding all messages into JSON array, including our just created one
+        JSONArray messagesJSONArray = new JSONArray(MessageUtil.getAllMessages(userId));
 
-                    "]," +
-                    "\"temperature\": 0.7" +
-                "}";
+        //adding JSON array into our json request
+        request.put("messages", messagesJSONArray);
 
-        //adding headers
-        HttpRequest request = HttpRequest.newBuilder()
+        //creating http request on our json request
+        String HttpRequestBody = request.toString();
+        HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(Properties.URL))
                 .POST(HttpRequest.BodyPublishers.ofString(HttpRequestBody))
                 .header("Authorization", Properties.chatGPTAuthToken)
                 .header("Content-Type", "application/json")
                 .build();
 
-        return request;
+        return httpRequest;
     }
 
     public static HttpResponse<String> sendRequest(HttpRequest request) {
+        //sending request
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response;
         try {
-            //sending request
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -46,21 +46,21 @@ public class RequestUtil {
         return response;
     }
 
-    public static String parseResponse(HttpResponse<String> httpResponse) {
-        String responseBody = httpResponse.body().replace("\\n", "\n").replace("\\\"", "`");
+    public static String parseResponse(HttpResponse<String> httpResponse, long userId) {
+        //parsing our response as JSON object
+        String responseBody = httpResponse.body();
+        JSONObject jsonObject = new JSONObject(responseBody);
 
-        //parsing response
-        int firstIndex = responseBody.indexOf("\"content\": \"") + "\"content\": \"".length();
+        //getting Open AI response
+        String response = (String) jsonObject.getJSONArray("choices")
+                                    .getJSONObject(0)
+                                    .getJSONObject("message")
+                                    .get("content");
 
-        StringBuilder builder = new StringBuilder();
-        int i = firstIndex;
-        while(responseBody.charAt(i) != '"')
-            builder.append(responseBody.charAt(i++));
+        //adding message to message
+        MessageUtil.addMessage(userId, "assistant", response);
 
-        String result = builder.toString();
-        result = result.replace("`", "\"");
-
-        return result;
+        return response;
     }
 
 }

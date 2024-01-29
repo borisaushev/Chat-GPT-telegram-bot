@@ -1,21 +1,21 @@
 package Util;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class Logger {
-    private final PrintWriter logger;
+    private static PrintWriter logger;
 
-    public Logger() throws IOException {
-        //Initializing logger
-        logger = new PrintWriter(new BufferedWriter(new FileWriter(Properties.logFile)));
-        logger.println("logger initialized ");
-        logger.flush();
-    }
+    public static synchronized void log(String str) {
+        //Initializing logger if it's not
+        if(logger == null) {
+            try {logger = new PrintWriter(new FileWriter(Properties.logFile));} catch (IOException ignored) {}
+            logger.println("logger initialized ");
+            logger.flush();
+        }
 
-    public void log(String str) {
+        //logging
         logger.println(str);
         logger.flush();
     }

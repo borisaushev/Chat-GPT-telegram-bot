@@ -1,5 +1,5 @@
 # Chat-GPT-telegram-bot
-Telegram bot representing chat GPT, using Chat GTP API
+Telegram bot representing chat GPT, using Chat GTP API и JSON
 
 ОБНОВЛЕНИЕ: Доступен диалог с ботом с сохранением и анализом прошлых сообщений
 

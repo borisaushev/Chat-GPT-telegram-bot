@@ -1,34 +1,34 @@
 package Util;
 
-import org.glassfish.grizzly.utils.Pair;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 public class MessageUtil {
 
-    private static final HashMap<Long, List<Pair<String, String>>> map = new HashMap<>();
+    //map of all the messages for each user
+    private static final HashMap<Long, LinkedList<JSONObject>> messagesMap = new HashMap<>();
 
-    public static void addMessage(long chatId, String request, String response) {
-        request = request.replace("{", "").replace("}", "");
-        response = response.replace("{", "").replace("}", "");
-        map.computeIfAbsent(chatId, k -> new LinkedList<>());
-        map.get(chatId).add(new Pair<>(request, response));
+    public static void addMessage(long userId,String role, String message) {
+        //creating an empty list for users messages if it's not created yet
+        messagesMap.computeIfAbsent(userId, k -> new LinkedList<>());
+
+        //adding message to messages map for user with userId
+        JSONObject userRequestJSON = new JSONObject();
+        userRequestJSON.put("role", role);
+        userRequestJSON.put("content", message);
+
+        messagesMap.get(userId).add(userRequestJSON);
+
+        //logging
+        Logger.log(role + " : " + message);
     }
 
-    public static String getAllMessages(long chatId) {
+    public static LinkedList<JSONObject> getAllMessages(long chatId) {
+        //creating an empty list for users messages if it's not created yet
+        messagesMap.computeIfAbsent(chatId, k -> new LinkedList<>());
 
-        if(map.get(chatId) == null || map.get(chatId).isEmpty())
-            return " ";
-
-
-        StringBuilder build = new StringBuilder();
-        for(Pair<String, String> pair : map.get(chatId)) {
-            build.append("{\"role\": \"user\", \"content\": \"" + pair.getFirst() + "\"},");
-            build.append("{\"role\": \"assistant\", \"content\": \"" + pair.getSecond() + "\"},");
-        }
-
-        return build.toString();
+        return messagesMap.get(chatId);
     }
 }
