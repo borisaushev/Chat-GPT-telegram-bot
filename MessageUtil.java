@@ -17,7 +17,7 @@ public class MessageUtil {
 
     public static String getAllMessages(long chatId) {
 
-        if(map.get(chatId) == null || map.get(chatId).size() == 0)
+        if(map.get(chatId) == null || map.get(chatId).isEmpty())
             return " ";
 
 
