@@ -1,3 +1,5 @@
+package Util;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,7 +13,6 @@ public class Logger {
         logger = new PrintWriter(new BufferedWriter(new FileWriter(Properties.logFile)));
         logger.println("logger initialized ");
         logger.flush();
-
     }
 
     public void log(String str) {

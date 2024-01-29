@@ -1,3 +1,5 @@
+package Util;
+
 import org.glassfish.grizzly.utils.Pair;
 
 import java.util.HashMap;
@@ -6,11 +8,11 @@ import java.util.List;
 
 public class MessageUtil {
 
-    private static HashMap<Long, List<Pair<String, String>>> map = new HashMap<>();
+    private static final HashMap<Long, List<Pair<String, String>>> map = new HashMap<>();
 
     public static void addMessage(long chatId, String request, String response) {
-        request = request.replace("\"", "`").replace("{", "").replace("}", "");
-        response = response.replace("\"", "`").replace("{", "").replace("}", "");
+        request = request.replace("{", "").replace("}", "");
+        response = response.replace("{", "").replace("}", "");
         map.computeIfAbsent(chatId, k -> new LinkedList<>());
         map.get(chatId).add(new Pair<>(request, response));
     }
