@@ -4,26 +4,24 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class Bot extends TelegramLongPollingBot {
-    BufferedWriter logger;
+
+    private final Logger logger;
 
     public Bot() throws IOException {
-        //Initializing logger
-        logger = new BufferedWriter(new FileWriter(Properties.logFile));
+        logger = new Logger();
     }
 
     @Override
     public void onUpdateReceived(Update update) {
 
-        //getting th request
+        //getting the request
         Message message = update.getMessage();
         String text = message.getText().replace("\"", "`").replace("\n", "").replace("\\", "");
         Long id = message.getChatId();
@@ -75,23 +73,19 @@ public class Bot extends TelegramLongPollingBot {
 
             String result = builder.toString();
 
-            //adding the message to message story
-            MessageUtil.addMessage(id, text.replace("\"", "`"), result);
-            mail.setText(result.replace("`", "\""));
-
             System.out.println("response: " + result);
 
-            //logging
-            try {
-                logger.write("request: " + HttpRequestBody);
-                logger.write("responce: " + responseBody);
-            } catch (IOException e) {
-                logger.close();
-                throw new RuntimeException(e);
-            }
-
             //sending the answer back to client
+            mail.setText(result.replace("`", "\""));
             execute(mail);
+
+            //adding the message to message story
+            MessageUtil.addMessage(id, text.replace("\"", "`"), result);
+
+            //logging
+            logger.log("request: " + HttpRequestBody);
+            logger.log("responce: " + responseBody);
+
 
         } catch (IOException | InterruptedException | TelegramApiException e) {
             System.out.println("exception " + e);
