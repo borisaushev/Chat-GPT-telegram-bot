@@ -10,23 +10,28 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
 
-        //getting the request
+        //getting the request and user id
         Message message = update.getMessage();
         Long userId = message.getChatId();
         String userRequest = message.getText();
 
+        //if user is texting bot for the first time, it introduces itself
         if(userRequest.equals("/start"))
             userRequest = "представься";
 
-        //saving JSON object from our user's request
-        MessageUtil.addMessage(userId,"user", userRequest);
+        //saving our user's request in message story
+        MessageUtil.saveMessage(userId,"user", userRequest);
 
-        //building request, from all our previous messages, and our just saved request
-        var request = RequestUtil.buildRequest(userId);
+        //building HttpRequest, from all our previous messages,
+        //including our just saved request
+        var httpRequest = RequestUtil.buildHttpRequest(userId);
 
-        //getting and parsing response
-        var httpResponse = RequestUtil.sendRequest(request);
-        String response = RequestUtil.parseResponse(httpResponse, userId);
+        //getting and parsing HttpResponse
+        var httpResponse = RequestUtil.sendHttpRequest(httpRequest);
+        String response = RequestUtil.parseHttpResponse(httpResponse);
+
+        //saving message to message story
+        MessageUtil.saveMessage(userId, "assistant", response);
 
         //sending message back to user
         sendMessage(response, userId);
@@ -34,7 +39,6 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private void sendMessage(String result, Long userId) {
-        //sending the answer back to client
         SendMessage mail = new SendMessage();
         mail.setChatId(userId.toString());
 
